@@ -18,23 +18,17 @@ package com.ronpcohendev;
 import com.datastax.driver.dse.*;
 import com.datastax.driver.dse.graph.*;
 import com.datastax.dse.graph.api.DseGraph;
-
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class FraudSample {
     private Logger logger = LoggerFactory.getLogger(FraudSample.class);
-
     private DseSession _dseSession=null;
     private DseCluster _dseCluster=null;
     private GraphTraversalSource g;
-
     private String _contactPoint;
     private String _customerID = "10000000-0000-0000-0000-0000000000800";
-
 
     public FraudSample (String contactPoint) {
         /*
@@ -45,8 +39,6 @@ public class FraudSample {
          */
 
         _contactPoint = contactPoint;
-        //String _customerID = "10000000-0000-0000-0000-0000000000800";
-
         connectCluster();
     }
     public static void main(String[] args) {
@@ -54,34 +46,27 @@ public class FraudSample {
         Logger logger = LoggerFactory.getLogger(FraudSample.class);
 
         if (args.length != 1){
-            logger.error("Please specify a node in the cluster to use as a contact point.");
+            logger.error("Please specify a node in the cluster (internal AWS IP) to use as a contact point.");
             System.exit(1);
         }
 
         String contactPoint = args[0];
 
         FraudSample fraudSample = new FraudSample(contactPoint);
-        fraudSample.run();
-
+        fraudSample.writeCustomer();
+        fraudSample.readCustomer();
         fraudSample.closeCluster();
         System.exit(0);
 
     }
     private void readCustomer() {
-        logger.info("Can we find the customer?");
-// g.V().has("customer", 'customerid',"10000000-0000-0000-0000-0000000000800")
+        logger.info("Can we find the new customer address?");
         GraphResultSet results =_dseSession.executeGraph(DseGraph.statementFromTraversal(g.V()
                 .has("customer", "customerid", _customerID)
                 .out("hasAddress").valueMap()));
 
-// Iterating:
-        for (GraphNode n : results) {
-
-            System.out.println(n);
-        }
-        //logger.info(results.one().;
-        logger.info("Finished reading data");
-
+        logger.info("Validate Customer Address: " + results.one());
+        logger.info("Finished reading data for customer: " + _customerID);
     }
 
     private void closeCluster() {
@@ -107,19 +92,18 @@ public class FraudSample {
             }
         }
 
-
         g = DseGraph.traversal(_dseSession);
 
     }
-    private void run() {
+    private void writeCustomer() {
         /*
         We will use the Graph Fluent API
          */
-        String customerID = "10000000-0000-0000-0000-0000000000800";
-        logger.info("Inserting Customer and Address Vertices");
+
+        logger.info("Inserting Customer and Address Vertices for customer: " + _customerID);
 
         GraphTraversal traversal = g.addV("customer")
-                .property("customerid", customerID)
+                .property("customerid", _customerID)
                 .property("createdtime", "2018-07-11T00:00:00Z")
                 .property("email","TinaTully@yahoo.com" )
                 .property("firstname", "Tina")
@@ -136,19 +120,8 @@ public class FraudSample {
                 .from("customer")
                 .to("address");
 
-
         GraphStatement statement = DseGraph.statementFromTraversal(traversal);
-        _dseSession.executeGraph(statement);
-        logger.info("Successfully finished inserting customer: " + customerID);
-        readCustomer();
-        if (_dseCluster != null) _dseCluster.close();
-        logger.info("Successfully finished inserting and reading customer: " + customerID);
-
-
-        System.exit(0);
-
-
-
-
+            _dseSession.executeGraph(statement);
+        logger.info("Successfully finished inserting customer: " + _customerID);
     }
 }
