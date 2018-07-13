@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.ronpcohendev.FraudSample
+Main-Class: com.datastax.fraud.FraudSample
 

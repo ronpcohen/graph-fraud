@@ -1,6 +1,6 @@
 /**
  * The FraudSample class provides simply demonstrates connecting to a DSE cluster
- * using the DataStax Enterprise Java Driver and adding a vertex and an edge.
+ * using the DataStax Enterprise Java Driver and adding two vertices and an edge.
  *
  * Important Assumptions:  Before running the sample code, make sure you run the Notebook
  * Exercises in the fraud asset, specifically schema creation and data load.  This code
@@ -14,7 +14,7 @@
  * The customer is "10000000-0000-0000-0000-0000000000800".
  *
  */
-package com.ronpcohendev;
+package com.datastax.fraud;
 
 import com.datastax.driver.dse.*;
 import com.datastax.driver.dse.graph.*;
