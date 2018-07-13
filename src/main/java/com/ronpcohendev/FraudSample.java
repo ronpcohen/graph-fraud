@@ -10,7 +10,8 @@
  * add a customer and address vertex and establish the relationship 'hasAddress' between
  * them.  The sample code will also retrieve the email address for that customer as a way
  * to validate the insert.  It is recommended that after running the code that you retrieve the
- * full address for the new customer.  The customer is "10000000-0000-0000-0000-0000000000800".
+ * full address for the new customer in DataStax Studio.
+ * The customer is "10000000-0000-0000-0000-0000000000800".
  *
  */
 package com.ronpcohendev;
@@ -44,18 +45,16 @@ public class FraudSample {
     public static void main(String[] args) {
         System.out.println("Hello, This FraudSample code using DSE Graph");
         Logger logger = LoggerFactory.getLogger(FraudSample.class);
-
-        if (args.length != 1){
-            logger.error("Please specify a node in the cluster (internal AWS IP) to use as a contact point.");
-            System.exit(1);
+        String contactPoint="node0";
+        if (args.length >0 ){
+            contactPoint = args[0];
         }
-
-        String contactPoint = args[0];
 
         FraudSample fraudSample = new FraudSample(contactPoint);
         fraudSample.writeCustomer();
         fraudSample.readCustomer();
         fraudSample.closeCluster();
+        logger.info("Exiting, status = 0");
         System.exit(0);
 
     }
@@ -80,7 +79,6 @@ public class FraudSample {
                     .addContactPoint(_contactPoint)
                     .withGraphOptions(new GraphOptions()
                             .setGraphName(graphName))
-                    // .setGraphSubProtocol(GraphProtocol.GRAPHSON_2_0))
                     .build();
             logger.error("Connecting to cluster using: " + _contactPoint);
             _dseSession = _dseCluster.connect();
