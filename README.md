@@ -4,10 +4,10 @@ The application will default to connecting to a DataStax Enterprise cluster usin
 insert 2 vertices and an edge between them.  The app will then execute a traversal to return the
 address for the customer just added.
 
-# invoke by connecting to node0 and invoking fraud.jar as follows:
+Invoke by connecting to node0 and invoking fraud.jar as follows:
 
 java -jar fraud.jar
 
-or
+or optionally specify an the local ip address
 
 java -jar fraud.jar  <ip address>
